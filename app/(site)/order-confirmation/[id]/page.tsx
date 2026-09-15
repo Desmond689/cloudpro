@@ -27,14 +27,17 @@ export default async function OrderConfirmationPage({ params }: { params: { id: 
         <div className="vapor-divider my-5" />
 
         <div className="flex flex-col gap-2">
-          {order.order_items.map((item: { id: string; product_name: string; quantity: number; subtotal: number }) => (
-            <div key={item.id} className="flex justify-between text-sm">
-              <span className="text-mute">
-                {item.product_name} × {item.quantity}
-              </span>
-              <span className="font-mono">${item.subtotal.toFixed(2)}</span>
-            </div>
-          ))}
+          {order.order_items.map(
+            (item: { id: string; product_name: string; quantity: number; subtotal: number; flavor?: string | null }) => (
+              <div key={item.id} className="flex justify-between text-sm">
+                <span className="text-mute">
+                  {item.product_name}
+                  {item.flavor ? ` (${item.flavor})` : ""} × {item.quantity}
+                </span>
+                <span className="font-mono">${item.subtotal.toFixed(2)}</span>
+              </div>
+            )
+          )}
         </div>
 
         <div className="vapor-divider my-5" />

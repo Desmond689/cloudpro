@@ -4,8 +4,7 @@ import type { Metadata } from "next";
 import { getProductBySlug, listRelatedProducts } from "@/lib/data/products";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Star } from "@/components/ui/Icons";
-import AddToCartButton from "@/components/cart/AddToCartButton";
-import BuyNowButton from "@/components/cart/BuyNowButton";
+import ProductPurchasePanel from "@/components/product/ProductPurchasePanel";
 import ProductCard from "@/components/product/ProductCard";
 import ReviewForm from "@/components/product/ReviewForm";
 import ShareButton from "@/components/product/ShareButton";
@@ -136,10 +135,16 @@ export default async function ProductPage({ params }: { params: { slug: string }
             </div>
           )}
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <AddToCartButton product={product} />
-            <BuyNowButton product={product} />
-          </div>
+          <ProductPurchasePanel product={product} />
+
+          <p className="mt-4 text-xs text-mute">
+            Buying more than a few units?{" "}
+            <a href="/wholesale" className="text-mist hover:underline">
+              Get wholesale pricing
+            </a>
+            .
+          </p>
+
           <div className="mt-3 flex items-center gap-4">
             <ShareButton title={product.name} />
             <WishlistButton productId={product.id} initialWishlisted={isWishlisted} />

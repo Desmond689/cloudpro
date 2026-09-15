@@ -8,10 +8,18 @@ export default function AddToCartButton({
   product,
   compact = false,
   quantity = 1,
+  flavor = null,
+  requireFlavor = false,
+  onMissingFlavor,
 }: {
   product: Product;
   compact?: boolean;
   quantity?: number;
+  /** Selected flavor, if the product has flavor options. */
+  flavor?: string | null;
+  /** When true, clicking without a flavor selected calls onMissingFlavor instead of adding. */
+  requireFlavor?: boolean;
+  onMissingFlavor?: () => void;
 }) {
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
@@ -19,7 +27,11 @@ export default function AddToCartButton({
 
   function handleClick() {
     if (outOfStock) return;
-    addItem(product, quantity);
+    if (requireFlavor && !flavor) {
+      onMissingFlavor?.();
+      return;
+    }
+    addItem(product, quantity, flavor);
     setAdded(true);
     setTimeout(() => setAdded(false), 1400);
   }

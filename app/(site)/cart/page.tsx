@@ -25,7 +25,7 @@ export default function CartPage() {
 
       <div className="flex flex-col gap-4">
         {lines.map((line) => (
-          <div key={line.productId} className="card flex items-center gap-4 p-4">
+          <div key={`${line.productId}-${line.flavor ?? "default"}`} className="card flex items-center gap-4 p-4">
             <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-raised">
               {line.image ? (
                 <Image src={line.image} alt={line.name} fill className="object-cover" />
@@ -36,19 +36,24 @@ export default function CartPage() {
               <Link href={`/product/${line.slug}`} className="font-display text-sm font-medium hover:text-mist">
                 {line.name}
               </Link>
+              {line.flavor && (
+                <p className="mt-0.5 font-mono text-[11px] text-mist">Flavor: {line.flavor}</p>
+              )}
               <p className="mt-1 font-mono text-xs text-mute">${line.price.toFixed(2)} each</p>
             </div>
 
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setQuantity(line.productId, line.quantity - 1)}
+                onClick={() => setQuantity(line.productId, line.quantity - 1, line.flavor)}
                 className="h-8 w-8 rounded-lg border border-line text-sm hover:border-mist/40"
               >
                 −
               </button>
               <span className="w-6 text-center font-mono text-sm">{line.quantity}</span>
               <button
-                onClick={() => setQuantity(line.productId, Math.min(line.quantity + 1, line.stock_quantity || 99))}
+                onClick={() =>
+                  setQuantity(line.productId, Math.min(line.quantity + 1, line.stock_quantity || 99), line.flavor)
+                }
                 className="h-8 w-8 rounded-lg border border-line text-sm hover:border-mist/40"
               >
                 +
@@ -57,7 +62,7 @@ export default function CartPage() {
 
             <p className="w-20 text-right font-mono text-sm">${(line.price * line.quantity).toFixed(2)}</p>
 
-            <button onClick={() => removeItem(line.productId)} className="text-xs text-mute hover:text-bad">
+            <button onClick={() => removeItem(line.productId, line.flavor)} className="text-xs text-mute hover:text-bad">
               Remove
             </button>
           </div>
@@ -75,6 +80,12 @@ export default function CartPage() {
           </div>
           <p className="text-xs text-faint">Shipping & final total calculated at checkout.</p>
           <p className="text-xs text-faint">No account required to order.</p>
+          <p className="text-xs text-faint">
+            Ordering in bulk?{" "}
+            <Link href="/wholesale" className="text-mist hover:underline">
+              Get wholesale pricing
+            </Link>
+          </p>
         </div>
         <div className="flex w-full max-w-xs gap-3">
           <Link href="/shop" className="btn-secondary flex-1 text-center">

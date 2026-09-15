@@ -103,7 +103,7 @@ export default function CheckoutPage() {
     const result = await createOrder({
       shipping,
       paymentMethod: method,
-      cartLines: lines.map((l) => ({ productId: l.productId, quantity: l.quantity })),
+      cartLines: lines.map((l) => ({ productId: l.productId, quantity: l.quantity, flavor: l.flavor ?? null })),
       deliveryZoneId: zoneId || null,
       giftCard:
         method === "giftcard"

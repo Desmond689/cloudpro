@@ -53,7 +53,9 @@ export default async function AdminOrderDetailPage({ params }: { params: { id: s
           {(items ?? []).map((item) => (
             <div key={item.id} className="flex items-center justify-between text-sm">
               <span>
-                {item.product_name} <span className="text-mute">×{item.quantity}</span>
+                {item.product_name}
+                {item.flavor ? <span className="text-mute"> ({item.flavor})</span> : null}{" "}
+                <span className="text-mute">×{item.quantity}</span>
               </span>
               <span className="font-mono">${Number(item.subtotal).toFixed(2)}</span>
             </div>

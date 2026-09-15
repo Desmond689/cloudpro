@@ -37,6 +37,15 @@ export interface Product {
   updated_at: string;
   product_images?: ProductImage[];
   categories?: Category | null;
+  /** Selectable flavor/variant options. Empty or null = no flavor choice needed. */
+  flavors?: string[] | null;
+  /** Optional bulk/wholesale price breaks, e.g. [{ minQty: 10, price: 19.99 }]. */
+  wholesale_tiers?: WholesaleTier[] | null;
+}
+
+export interface WholesaleTier {
+  minQty: number;
+  price: number;
 }
 
 export interface CartLine {
@@ -47,6 +56,8 @@ export interface CartLine {
   image: string | null;
   quantity: number;
   stock_quantity: number;
+  /** Chosen flavor/variant, if the product offers any. */
+  flavor?: string | null;
 }
 
 export interface ShippingDetails {
@@ -131,6 +142,20 @@ export interface OrderItem {
   unit_price: number;
   quantity: number;
   subtotal: number;
+  flavor?: string | null;
+}
+
+export interface WholesaleInquiry {
+  id: string;
+  business_name: string;
+  contact_name: string;
+  email: string;
+  phone: string | null;
+  products_interested: string;
+  estimated_monthly_volume: string | null;
+  message: string | null;
+  status: "new" | "contacted" | "closed";
+  created_at: string;
 }
 
 export interface Review {

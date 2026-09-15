@@ -15,6 +15,7 @@ type ProductDefaults = {
   stock_quantity?: number;
   low_stock_threshold?: number;
   is_published?: boolean;
+  flavors?: string[];
 };
 
 export default function ProductForm({
@@ -146,6 +147,21 @@ export default function ProductForm({
             </option>
           ))}
         </select>
+      </div>
+
+      <div>
+        <label className="mb-1.5 block text-xs text-mute">
+          Flavors <span className="text-faint">(comma-separated — leave blank if this product has no flavor choice)</span>
+        </label>
+        <input
+          name="flavors"
+          placeholder="Blue Razz Ice, Sour Apple, Wintergreen"
+          defaultValue={defaults?.flavors?.join(", ")}
+          className="w-full rounded-xl border border-line bg-raised px-4 py-3 text-sm focus:border-mist/50"
+        />
+        <p className="mt-1 text-[11px] text-faint">
+          When set, shoppers must pick one before adding this product to their cart.
+        </p>
       </div>
 
       <label className="flex items-center gap-2 text-sm">

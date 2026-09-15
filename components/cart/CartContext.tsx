@@ -7,9 +7,9 @@ interface CartContextValue {
   lines: CartLine[];
   itemCount: number;
   subtotal: number;
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  setQuantity: (productId: string, quantity: number) => void;
+  addItem: (product: Product, quantity?: number, flavor?: string | null) => void;
+  removeItem: (productId: string, flavor?: string | null) => void;
+  setQuantity: (productId: string, quantity: number, flavor?: string | null) => void;
   clear: () => void;
 }
 
@@ -40,13 +40,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [lines, hydrated]);
 
-  const addItem = useCallback((product: Product, quantity = 1) => {
+  // A cart line is identified by productId + flavor together — the same
+  // product in two different flavors is two separate lines.
+  function sameLine(l: CartLine, productId: string, flavor?: string | null) {
+    return l.productId === productId && (l.flavor ?? null) === (flavor ?? null);
+  }
+
+  const addItem = useCallback((product: Product, quantity = 1, flavor: string | null = null) => {
     setLines((prev) => {
-      const existing = prev.find((l) => l.productId === product.id);
+      const existing = prev.find((l) => sameLine(l, product.id, flavor));
       const image = product.product_images?.[0]?.url ?? null;
       if (existing) {
         const nextQty = Math.min(existing.quantity + quantity, product.stock_quantity || 99);
-        return prev.map((l) => (l.productId === product.id ? { ...l, quantity: nextQty } : l));
+        return prev.map((l) => (sameLine(l, product.id, flavor) ? { ...l, quantity: nextQty } : l));
       }
       return [
         ...prev,
@@ -58,19 +64,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           image,
           quantity: Math.min(quantity, product.stock_quantity || 99),
           stock_quantity: product.stock_quantity,
+          flavor: flavor ?? null,
         },
       ];
     });
   }, []);
 
-  const removeItem = useCallback((productId: string) => {
-    setLines((prev) => prev.filter((l) => l.productId !== productId));
+  const removeItem = useCallback((productId: string, flavor: string | null = null) => {
+    setLines((prev) => prev.filter((l) => !sameLine(l, productId, flavor)));
   }, []);
 
-  const setQuantity = useCallback((productId: string, quantity: number) => {
+  const setQuantity = useCallback((productId: string, quantity: number, flavor: string | null = null) => {
     setLines((prev) =>
       prev
-        .map((l) => (l.productId === productId ? { ...l, quantity: Math.max(1, quantity) } : l))
+        .map((l) => (sameLine(l, productId, flavor) ? { ...l, quantity: Math.max(1, quantity) } : l))
         .filter((l) => l.quantity > 0)
     );
   }, []);

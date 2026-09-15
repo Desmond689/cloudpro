@@ -28,6 +28,18 @@ function slugify(input: string) {
     .replace(/(^-|-$)/g, "");
 }
 
+// Parses the admin form's comma-separated flavors field into a clean
+// string array — trims each entry, drops blanks, and de-dupes.
+function parseFlavorsInput(raw: FormDataEntryValue | null): string[] {
+  const value = String(raw ?? "");
+  const seen = new Set<string>();
+  for (const part of value.split(",")) {
+    const trimmed = part.trim();
+    if (trimmed) seen.add(trimmed);
+  }
+  return Array.from(seen);
+}
+
 // ---------- products ----------
 
 export async function createProduct(formData: FormData) {
@@ -42,6 +54,8 @@ export async function createProduct(formData: FormData) {
     return { ok: false as const, error: "Name, a valid price, and stock are required." };
   }
 
+  const flavors = parseFlavorsInput(formData.get("flavors"));
+
   const { data: product, error } = await supabase
     .from("products")
     .insert({
@@ -54,6 +68,7 @@ export async function createProduct(formData: FormData) {
       stock_quantity: stock,
       low_stock_threshold: Number(formData.get("low_stock_threshold") ?? 5),
       is_published: formData.get("is_published") === "on",
+      flavors,
     })
     .select()
     .single();
@@ -79,6 +94,8 @@ export async function updateProduct(productId: string, formData: FormData) {
     return { ok: false as const, error: "Name, a valid price, and stock are required." };
   }
 
+  const flavors = parseFlavorsInput(formData.get("flavors"));
+
   const { error } = await supabase
     .from("products")
     .update({
@@ -90,6 +107,7 @@ export async function updateProduct(productId: string, formData: FormData) {
       stock_quantity: stock,
       low_stock_threshold: Number(formData.get("low_stock_threshold") ?? 5),
       is_published: formData.get("is_published") === "on",
+      flavors,
     })
     .eq("id", productId);
 

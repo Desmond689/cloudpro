@@ -20,7 +20,7 @@ interface BtcPaymentInput {
 interface CheckoutInput {
   shipping: ShippingDetails;
   paymentMethod: PaymentMethod;
-  cartLines: { productId: string; quantity: number }[]; // client only sends id + qty
+  cartLines: { productId: string; quantity: number; flavor?: string | null }[]; // client only sends id + qty + flavor
   deliveryZoneId?: string | null;
   giftCard?: GiftCardInput;
   btcPayment?: BtcPaymentInput;
@@ -82,7 +82,14 @@ export async function createOrder(input: CheckoutInput) {
     return { ok: false as const, error: "Could not verify your cart. Please try again." };
   }
 
-  const validatedItems: { product_id: string; product_name: string; unit_price: number; quantity: number; subtotal: number }[] = [];
+  const validatedItems: {
+    product_id: string;
+    product_name: string;
+    unit_price: number;
+    quantity: number;
+    subtotal: number;
+    flavor: string | null;
+  }[] = [];
 
   for (const line of cartLines) {
     const product = products.find((p) => p.id === line.productId);
@@ -98,6 +105,7 @@ export async function createOrder(input: CheckoutInput) {
       unit_price: product.price,
       quantity: line.quantity,
       subtotal: Number((product.price * line.quantity).toFixed(2)),
+      flavor: line.flavor?.trim() || null,
     });
   }
 
