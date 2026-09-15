@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-line;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-void text-ink font-body antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+  ::selection {
+    @apply bg-mist/30 text-ink;
+  }
+  :focus-visible {
+    outline: 2px solid #7FD9F0;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Signature element: a diffused vapor trail used as a section divider
+     instead of a hard border — a blurred horizontal mist line. */
+  .vapor-divider {
+    @apply relative h-px w-full bg-vapor-fade opacity-60;
+  }
+
+  .vapor-divider::after {
+    content: "";
+    @apply absolute inset-0 bg-vapor-fade blur-md opacity-70;
+  }
+
+  .container-px {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-ember px-6 py-3
+      font-display text-sm font-medium text-void shadow-ember transition
+      hover:bg-ember-soft active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-line
+      bg-raised/60 px-6 py-3 font-display text-sm font-medium text-ink backdrop-blur transition
+      hover:border-mist/40 hover:text-mist active:scale-[0.98];
+  }
+
+  .card {
+    @apply rounded-2xl border border-line bg-surface transition
+      hover:border-mist/30 hover:shadow-mist;
+  }
+
+  .input {
+    @apply rounded-lg border border-line bg-raised px-3 py-2.5 text-sm text-ink
+      placeholder:text-faint focus:border-mist/50;
+  }
+
+  /* Kept for pages outside this pass (admin, account, policy pages) that
+     still use it. Homepage sections below use real headings instead. */
+  .eyebrow {
+    @apply font-mono text-xs uppercase tracking-[0.2em] text-mist;
+  }
+
+  /* Trust chip — used for payment methods & guarantees, not a generic card */
+  .trust-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-line bg-raised/70
+      px-3.5 py-2 text-xs text-mute backdrop-blur;
+  }
+
+  /* Floating proof badge anchored over the hero product shot */
+  .proof-badge {
+    @apply flex items-center gap-2.5 rounded-2xl border border-line bg-surface/90
+      px-3.5 py-2.5 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.6)] backdrop-blur-md;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift,
+  .animate-drift-slow,
+  .animate-fade-up {
+    animation: none !important;
+  }
+}
