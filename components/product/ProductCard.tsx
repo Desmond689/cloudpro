@@ -16,16 +16,16 @@ export default function ProductCard({ product }: { product: Product }) {
       : { text: "In stock", cls: "text-ok" };
 
   return (
-    <TiltCard strength={5} className="group">
-      <div className="card flex h-full flex-col overflow-hidden transition group-hover:shadow-mist">
-        <Link href={`/product/${product.slug}`} className="relative block aspect-square bg-raised">
+    <TiltCard strength={9} className="group h-full">
+      <div className="card-3d sheen-host flex h-full flex-col overflow-hidden group-hover:border-mist/40 group-hover:shadow-mist">
+        <Link href={`/product/${product.slug}`} className="relative block aspect-square bg-raised [transform:translateZ(28px)]">
           {image ? (
             <Image
               src={image.url}
               alt={image.alt_text ?? product.name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className="object-cover transition duration-300 group-hover:scale-[1.04]"
+              className="object-cover transition duration-500 group-hover:scale-[1.07]"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-xs text-faint">No image</div>

@@ -10,9 +10,17 @@ import { createClient } from "@/lib/supabase/client";
 import GiftCardEntry, { type GiftCardValue } from "@/components/order/GiftCardEntry";
 import BtcPaymentEntry, { type BtcPaymentValue } from "@/components/order/BtcPaymentEntry";
 import CopyButton from "@/components/ui/CopyButton";
+import PaymentMethodPicker from "@/components/order/PaymentMethodPicker";
+import { buildOrderWhatsAppUrl, type HandoffPaymentMethod } from "@/lib/whatsapp";
 import type { DeliveryZone, PaymentMethod, StoreSettings } from "@/lib/types";
 
 const SHIPPING_COST = 6.99;
+
+const HANDOFF_METHODS: HandoffPaymentMethod[] = ["cashapp", "venmo", "chime", "zelle", "applepay"];
+
+function isHandoff(m: PaymentMethod): m is HandoffPaymentMethod {
+  return (HANDOFF_METHODS as string[]).includes(m);
+}
 
 export default function CheckoutPage() {
   const { lines, subtotal, clear } = useCart();
@@ -131,6 +139,32 @@ export default function CheckoutPage() {
     }
 
     clear();
+
+    // For app-based payments, hand the customer to WhatsApp with a
+    // prefilled order summary so we can send payment details there.
+    if (isHandoff(method)) {
+      const deliveryFee = shippingCost;
+      const url = buildOrderWhatsAppUrl({
+        orderId: result.orderId,
+        products: lines.map((l) => ({
+          name: l.name,
+          flavor: l.flavor ?? null,
+          quantity: l.quantity,
+          lineTotal: l.price * l.quantity,
+        })),
+        subtotal,
+        deliveryFee,
+        total: subtotal + deliveryFee,
+        paymentMethod: method,
+        customerName: shipping.fullName,
+        customerPhone: shipping.phone,
+        customerAddress: [shipping.address, shipping.city, shipping.region, shipping.postalCode, shipping.country]
+          .filter(Boolean)
+          .join(", "),
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
     router.push(`/order-confirmation/${result.orderId}`);
   }
 
@@ -177,6 +211,14 @@ export default function CheckoutPage() {
 
           <section>
             <p className="eyebrow mb-3">Payment method</p>
+
+            <p className="mb-2 text-xs text-mute">Pay by app — details sent on WhatsApp</p>
+            <PaymentMethodPicker
+              value={isHandoff(method) ? method : null}
+              onChange={(m) => setMethod(m)}
+            />
+
+            <p className="mb-2 mt-6 text-xs text-mute">Other options</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -254,7 +296,11 @@ export default function CheckoutPage() {
           {error && <p className="mt-4 text-xs text-bad">{error}</p>}
 
           <button type="submit" disabled={submitting} className="btn-primary mt-6 w-full">
-            {submitting ? "Placing order…" : "Place order"}
+            {submitting
+              ? "Placing order…"
+              : isHandoff(method)
+              ? "Place order & continue on WhatsApp →"
+              : "Place order"}
           </button>
         </aside>
       </form>

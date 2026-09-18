@@ -23,3 +23,7 @@ export const NAV_LINKS = [
 // admin-editable in Phase 8 — BTC address + QR code are set from the
 // admin dashboard and stored server-side, never hardcoded in the repo.
 export const PAYMENT_METHODS_PLACEHOLDER = ["giftcard", "btc"] as const;
+
+// Business WhatsApp line. Digits only, full international format (no "+").
+export const WHATSAPP_NUMBER = "19852370513";
+export const WHATSAPP_DISPLAY = "+1 (985) 237-0513";

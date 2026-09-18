@@ -1,7 +1,7 @@
 export type OrderStatus =
   | "pending" | "confirmed" | "processing" | "shipped" | "in_transit" | "delivered" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
-export type PaymentMethod = "giftcard" | "btc";
+export type PaymentMethod = "giftcard" | "btc" | "cashapp" | "venmo" | "chime" | "zelle" | "applepay";
 
 export interface Category {
   id: string;

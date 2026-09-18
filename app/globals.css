@@ -19,7 +19,7 @@
     @apply bg-mist/30 text-ink;
   }
   :focus-visible {
-    outline: 2px solid #7FD9F0;
+    outline: 2px solid #4DE2FF;
     outline-offset: 2px;
   }
 }
@@ -55,6 +55,35 @@
   .card {
     @apply rounded-2xl border border-line bg-surface transition
       hover:border-mist/30 hover:shadow-mist;
+  }
+
+  /* 3D-feeling panel: top edge catches light, body sits on a deep drop
+     shadow, so cards read as physical slabs rather than flat rectangles. */
+  .card-3d {
+    @apply relative rounded-2xl border border-line bg-gradient-to-b from-raised
+      to-surface shadow-lift transition duration-300;
+  }
+
+  .card-3d::before {
+    content: "";
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px
+      bg-gradient-to-r from-transparent via-mist/50 to-transparent;
+  }
+
+  /* A light sweep that runs across a surface once on hover. */
+  .sheen-host {
+    @apply relative overflow-hidden;
+  }
+
+  .sheen-host::after {
+    content: "";
+    @apply pointer-events-none absolute inset-y-0 -left-1/3 w-1/3
+      bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0;
+  }
+
+  .sheen-host:hover::after {
+    @apply opacity-100;
+    animation: sheen 1.1s ease-out;
   }
 
   .input {

@@ -331,13 +331,29 @@ export default function ChatWidget() {
         </div>
       )}
 
-      {/* Floating button — does NOT auto-open */}
+      {/* Floating launcher — labeled pill so it reads as help, not decoration.
+          Does NOT auto-open. */}
       <button
         onClick={() => setOpen((v) => !v)}
-        aria-label={open ? "Close chat" : "Open AI assistant"}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-ember text-void shadow-ember transition hover:scale-105 active:scale-95"
+        aria-label={open ? "Close chat" : "Open help chat"}
+        className={`flex items-center gap-2.5 rounded-full bg-ember font-display font-semibold text-void shadow-ember transition hover:scale-[1.03] active:scale-95 ${
+          open ? "h-14 w-14 justify-center" : "py-3.5 pl-4 pr-5"
+        }`}
       >
-        {open ? "✕" : "✦"}
+        {open ? (
+          <span className="text-lg">✕</span>
+        ) : (
+          <>
+            <span className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-void/15 text-sm">
+              ✦
+              <span className="absolute -right-0.5 -top-0.5 h-2 w-2 animate-pulse rounded-full bg-ok" />
+            </span>
+            <span className="text-sm leading-tight">
+              Need help finding
+              <br className="hidden sm:block" /> something?
+            </span>
+          </>
+        )}
       </button>
     </div>
   );

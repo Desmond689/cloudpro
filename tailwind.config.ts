@@ -20,14 +20,14 @@ const config: Config = {
         faint: "#565D6B",
         // Brand — "vapor" cool mist (primary) + "ember" warm coil glow (CTA/accent)
         mist: {
-          DEFAULT: "#7FD9F0",
-          soft: "#B6ECFA",
-          deep: "#3FA8C2",
+          DEFAULT: "#4DE2FF",
+          soft: "#9FF0FF",
+          deep: "#1EA6C7",
         },
         ember: {
-          DEFAULT: "#FF6B3D",
-          soft: "#FF9770",
-          deep: "#D6502A",
+          DEFAULT: "#FF7A2F",
+          soft: "#FFA463",
+          deep: "#E0551C",
         },
         ok: "#6FE3B0",
         warn: "#F2C14E",
@@ -43,12 +43,13 @@ const config: Config = {
         "2xl": "1.5rem",
       },
       boxShadow: {
-        mist: "0 0 0 1px rgba(127,217,240,0.15), 0 12px 40px -12px rgba(127,217,240,0.25)",
-        ember: "0 0 0 1px rgba(255,107,61,0.25), 0 12px 32px -10px rgba(255,107,61,0.35)",
+        mist: "0 0 0 1px rgba(77,226,255,0.22), 0 16px 48px -14px rgba(77,226,255,0.40)",
+        ember: "0 0 0 1px rgba(255,122,47,0.30), 0 16px 40px -12px rgba(255,122,47,0.48)",
+        lift: "0 24px 60px -20px rgba(0,0,0,0.75), 0 2px 0 0 rgba(255,255,255,0.04) inset",
       },
       backgroundImage: {
         "vapor-fade":
-          "linear-gradient(90deg, transparent 0%, rgba(127,217,240,0.35) 50%, transparent 100%)",
+          "linear-gradient(90deg, transparent 0%, rgba(77,226,255,0.45) 50%, transparent 100%)",
       },
       keyframes: {
         drift: {
@@ -59,11 +60,21 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
+        sheen: {
+          "0%": { transform: "translateX(-120%) skewX(-18deg)" },
+          "100%": { transform: "translateX(220%) skewX(-18deg)" },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-6px)" },
+        },
       },
       animation: {
         drift: "drift 14s ease-in-out infinite",
         "drift-slow": "drift 22s ease-in-out infinite",
         "fade-up": "fade-up 0.5s ease-out both",
+        sheen: "sheen 1.1s ease-out",
+        float: "float 5s ease-in-out infinite",
       },
     },
   },
