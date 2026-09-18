@@ -33,7 +33,9 @@ export default function WholesaleInquiryRow({ inquiry }: { inquiry: WholesaleInq
   const [pending, startTransition] = useTransition();
 
   function setStatus(status: WholesaleInquiry["status"]) {
-    startTransition(() => updateWholesaleInquiryStatus(inquiry.id, status));
+    startTransition(() => {
+      void updateWholesaleInquiryStatus(inquiry.id, status);
+    });
   }
 
   return (
