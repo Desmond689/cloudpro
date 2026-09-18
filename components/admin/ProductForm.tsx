@@ -16,6 +16,7 @@ type ProductDefaults = {
   low_stock_threshold?: number;
   is_published?: boolean;
   flavors?: string[];
+  wholesale_tiers?: { minQty: number; price: number }[];
 };
 
 export default function ProductForm({
@@ -161,6 +162,22 @@ export default function ProductForm({
         />
         <p className="mt-1 text-[11px] text-faint">
           When set, shoppers must pick one before adding this product to their cart.
+        </p>
+      </div>
+
+      <div>
+        <label className="mb-1.5 block text-xs text-mute">
+          Wholesale tiers <span className="text-faint">(qty:price pairs, comma-separated — leave blank for none)</span>
+        </label>
+        <input
+          name="wholesale_tiers"
+          placeholder="10:19.99, 50:16.99, 100:14.99"
+          defaultValue={defaults?.wholesale_tiers?.map((t) => `${t.minQty}:${t.price}`).join(", ")}
+          className="w-full rounded-xl border border-line bg-raised px-4 py-3 text-sm focus:border-mist/50"
+        />
+        <p className="mt-1 text-[11px] text-faint">
+          Shown as a "buy more, pay less" table on the product page. This is separate from the /wholesale inquiry
+          form for custom reseller quotes.
         </p>
       </div>
 

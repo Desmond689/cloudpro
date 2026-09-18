@@ -5,6 +5,7 @@ import { getProductBySlug, listRelatedProducts } from "@/lib/data/products";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { Star } from "@/components/ui/Icons";
 import ProductPurchasePanel from "@/components/product/ProductPurchasePanel";
+import WholesaleTierTable from "@/components/product/WholesaleTierTable";
 import ProductCard from "@/components/product/ProductCard";
 import ReviewForm from "@/components/product/ReviewForm";
 import ShareButton from "@/components/product/ShareButton";
@@ -137,13 +138,17 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
           <ProductPurchasePanel product={product} />
 
-          <p className="mt-4 text-xs text-mute">
-            Buying more than a few units?{" "}
-            <a href="/wholesale" className="text-mist hover:underline">
-              Get wholesale pricing
-            </a>
-            .
-          </p>
+          {(product.wholesale_tiers?.length ?? 0) > 0 ? (
+            <WholesaleTierTable basePrice={product.price} tiers={product.wholesale_tiers!} />
+          ) : (
+            <p className="mt-4 text-xs text-mute">
+              Buying more than a few units?{" "}
+              <a href="/wholesale" className="text-mist hover:underline">
+                Get wholesale pricing
+              </a>
+              .
+            </p>
+          )}
 
           <div className="mt-3 flex items-center gap-4">
             <ShareButton title={product.name} />

@@ -75,3 +75,37 @@ export function buildSupportWhatsAppUrl(prefill?: string): string {
   const text = prefill ?? "Hi! I have a question about an order.";
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
 }
+
+export interface WholesaleHandoffDetails {
+  businessName: string;
+  contactName: string;
+  email: string;
+  phone?: string;
+  productsInterested: string;
+  estimatedMonthlyVolume?: string;
+}
+
+/**
+ * Lets a wholesale lead follow up on WhatsApp immediately after submitting
+ * the form, instead of waiting on email/Telegram alone. This is a
+ * customer-initiated wa.me link (same mechanism as the checkout handoff) —
+ * true server-pushed WhatsApp messages require a Meta Business API
+ * integration this project doesn't have configured.
+ */
+export function buildWholesaleWhatsAppUrl(d: WholesaleHandoffDetails): string {
+  const text = [
+    "Hello! I just submitted a wholesale inquiry on your site.",
+    "",
+    `Business: ${d.businessName}`,
+    `Contact: ${d.contactName}`,
+    `Email: ${d.email}`,
+    d.phone ? `Phone: ${d.phone}` : null,
+    `Interested in: ${d.productsInterested}`,
+    d.estimatedMonthlyVolume ? `Estimated monthly volume: ${d.estimatedMonthlyVolume}` : null,
+    "",
+    "Could you send me wholesale pricing and minimum order quantities?",
+  ]
+    .filter(Boolean)
+    .join("\n");
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+}

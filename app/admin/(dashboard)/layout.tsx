@@ -10,6 +10,7 @@ const ADMIN_LINKS = [
   { label: "AI Products", href: "/admin/ai-products" },
   { label: "AI Marketing", href: "/admin/ai-marketing" },
   { label: "Orders", href: "/admin/orders" },
+  { label: "Wholesale", href: "/admin/wholesale" },
   { label: "Payments", href: "/admin/payments" },
   { label: "Customers", href: "/admin/customers" },
   { label: "Delivery", href: "/admin/delivery" },

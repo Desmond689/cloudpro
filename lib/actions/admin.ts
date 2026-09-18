@@ -40,6 +40,22 @@ function parseFlavorsInput(raw: FormDataEntryValue | null): string[] {
   return Array.from(seen);
 }
 
+// Parses the admin form's "qty:price, qty:price" wholesale tiers field
+// into a clean, sorted array. Silently skips malformed rows.
+function parseWholesaleTiersInput(raw: FormDataEntryValue | null): { minQty: number; price: number }[] {
+  const value = String(raw ?? "");
+  const tiers: { minQty: number; price: number }[] = [];
+  for (const part of value.split(",")) {
+    const [qtyStr, priceStr] = part.split(":").map((s) => s.trim());
+    const minQty = Number(qtyStr);
+    const price = Number(priceStr);
+    if (qtyStr && priceStr && Number.isFinite(minQty) && Number.isFinite(price) && minQty > 0 && price > 0) {
+      tiers.push({ minQty, price });
+    }
+  }
+  return tiers.sort((a, b) => a.minQty - b.minQty);
+}
+
 // ---------- products ----------
 
 export async function createProduct(formData: FormData) {
@@ -69,6 +85,7 @@ export async function createProduct(formData: FormData) {
       low_stock_threshold: Number(formData.get("low_stock_threshold") ?? 5),
       is_published: formData.get("is_published") === "on",
       flavors,
+      wholesale_tiers: parseWholesaleTiersInput(formData.get("wholesale_tiers")),
     })
     .select()
     .single();
@@ -108,6 +125,7 @@ export async function updateProduct(productId: string, formData: FormData) {
       low_stock_threshold: Number(formData.get("low_stock_threshold") ?? 5),
       is_published: formData.get("is_published") === "on",
       flavors,
+      wholesale_tiers: parseWholesaleTiersInput(formData.get("wholesale_tiers")),
     })
     .eq("id", productId);
 
@@ -489,5 +507,18 @@ export async function setCustomerBlocked(email: string, blocked: boolean) {
   if (error) return { ok: false as const, error: "Could not update this account." };
 
   revalidatePath(`/admin/customers/${encodeURIComponent(email)}`);
+  return { ok: true as const };
+}
+
+// ---------- wholesale inquiries ----------
+
+export async function updateWholesaleInquiryStatus(inquiryId: string, status: "new" | "contacted" | "closed") {
+  const supabase = await requireAdmin();
+  if (!supabase) return { ok: false as const, error: "Not authorized." };
+
+  const { error } = await supabase.from("wholesale_inquiries").update({ status }).eq("id", inquiryId);
+  if (error) return { ok: false as const, error: "Could not update this inquiry." };
+
+  revalidatePath("/admin/wholesale");
   return { ok: true as const };
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { submitWholesaleInquiry } from "@/lib/actions/wholesale";
+import { buildWholesaleWhatsAppUrl } from "@/lib/whatsapp";
 
 const VOLUME_OPTIONS = ["Under 50 units", "50–200 units", "200–1,000 units", "1,000+ units"];
 
@@ -41,12 +42,28 @@ export default function WholesaleForm() {
   }
 
   if (sent) {
+    const whatsappUrl = buildWholesaleWhatsAppUrl({
+      businessName,
+      contactName,
+      email,
+      phone,
+      productsInterested,
+      estimatedMonthlyVolume: volume,
+    });
     return (
-      <div className="card p-8 text-center">
+      <div className="card-3d p-8 text-center">
         <p className="font-display text-lg font-semibold">Inquiry received</p>
         <p className="mt-2 text-sm text-mute">
           Thanks — our wholesale team will reach out to {email} with pricing and minimums within one business day.
         </p>
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 font-display text-sm font-semibold text-[#06281A] transition hover:brightness-95"
+        >
+          Get a faster reply on WhatsApp →
+        </a>
       </div>
     );
   }
