@@ -89,7 +89,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Track cart intent for abandoned-cart automation (non-blocking)
     try {
       await reportCartIntent({
         email: shipping.email,
@@ -140,12 +139,15 @@ export default function CheckoutPage() {
 
     clear();
 
-    // For app-based payments, hand the customer to WhatsApp with a
-    // prefilled order summary so we can send payment details there.
+    // The order is created first. For P2P payments, navigate directly to the
+    // store's WhatsApp profile with the exact order summary prefilled. Using
+    // location.assign (instead of window.open) avoids popup blockers and makes
+    // WhatsApp the customer's next page on both desktop and mobile.
     if (isHandoff(method)) {
-      const deliveryFee = shippingCost;
       const url = buildOrderWhatsAppUrl({
-        orderId: result.orderId,
+        // Use the human-readable order number in the customer message rather
+        // than exposing the internal database UUID.
+        orderId: result.orderNumber,
         products: lines.map((l) => ({
           name: l.name,
           flavor: l.flavor ?? null,
@@ -153,8 +155,8 @@ export default function CheckoutPage() {
           lineTotal: l.price * l.quantity,
         })),
         subtotal,
-        deliveryFee,
-        total: subtotal + deliveryFee,
+        deliveryFee: shippingCost,
+        total: subtotal + shippingCost,
         paymentMethod: method,
         customerName: shipping.fullName,
         customerPhone: shipping.phone,
@@ -162,7 +164,9 @@ export default function CheckoutPage() {
           .filter(Boolean)
           .join(", "),
       });
-      window.open(url, "_blank", "noopener,noreferrer");
+
+      window.location.assign(url);
+      return;
     }
 
     router.push(`/order-confirmation/${result.orderId}`);
@@ -194,11 +198,7 @@ export default function CheckoutPage() {
           {zones.length > 0 && (
             <section>
               <p className="eyebrow mb-3">Delivery zone</p>
-              <select
-                value={zoneId}
-                onChange={(e) => setZoneId(e.target.value)}
-                className="input w-full"
-              >
+              <select value={zoneId} onChange={(e) => setZoneId(e.target.value)} className="input w-full">
                 <option value="">Standard shipping — ${SHIPPING_COST.toFixed(2)}</option>
                 {zones.map((z) => (
                   <option key={z.id} value={z.id}>
@@ -211,30 +211,22 @@ export default function CheckoutPage() {
 
           <section>
             <p className="eyebrow mb-3">Payment method</p>
-
             <p className="mb-2 text-xs text-mute">Pay by app — details sent on WhatsApp</p>
-            <PaymentMethodPicker
-              value={isHandoff(method) ? method : null}
-              onChange={(m) => setMethod(m)}
-            />
+            <PaymentMethodPicker value={isHandoff(method) ? method : null} onChange={(m) => setMethod(m)} />
 
             <p className="mb-2 mt-6 text-xs text-mute">Other options</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setMethod("giftcard")}
-                className={`rounded-xl border p-4 text-left text-sm ${
-                  method === "giftcard" ? "border-mist bg-mist/10" : "border-line"
-                }`}
+                className={`rounded-xl border p-4 text-left text-sm ${method === "giftcard" ? "border-mist bg-mist/10" : "border-line"}`}
               >
                 Gift card
               </button>
               <button
                 type="button"
                 onClick={() => setMethod("btc")}
-                className={`rounded-xl border p-4 text-left text-sm ${
-                  method === "btc" ? "border-mist bg-mist/10" : "border-line"
-                }`}
+                className={`rounded-xl border p-4 text-left text-sm ${method === "btc" ? "border-mist bg-mist/10" : "border-line"}`}
               >
                 Bitcoin (BTC)
               </button>
@@ -256,9 +248,7 @@ export default function CheckoutPage() {
                     )}
                   </>
                 ) : (
-                  <p className="text-xs text-mute">
-                    BTC address hasn&apos;t been set up yet — place your order and we&apos;ll follow up with payment details.
-                  </p>
+                  <p className="text-xs text-mute">BTC address hasn&apos;t been set up yet — place your order and we&apos;ll follow up with payment details.</p>
                 )}
               </div>
             )}
@@ -272,9 +262,7 @@ export default function CheckoutPage() {
           <div className="flex flex-col gap-2">
             {lines.map((l) => (
               <div key={l.productId} className="flex justify-between text-sm">
-                <span className="text-mute">
-                  {l.name} × {l.quantity}
-                </span>
+                <span className="text-mute">{l.name} × {l.quantity}</span>
                 <span className="font-mono">${(l.price * l.quantity).toFixed(2)}</span>
               </div>
             ))}
@@ -296,11 +284,7 @@ export default function CheckoutPage() {
           {error && <p className="mt-4 text-xs text-bad">{error}</p>}
 
           <button type="submit" disabled={submitting} className="btn-primary mt-6 w-full">
-            {submitting
-              ? "Placing order…"
-              : isHandoff(method)
-              ? "Place order & continue on WhatsApp →"
-              : "Place order"}
+            {submitting ? "Placing order…" : isHandoff(method) ? "Place order & continue on WhatsApp →" : "Place order"}
           </button>
         </aside>
       </form>
